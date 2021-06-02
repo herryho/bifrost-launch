@@ -19,11 +19,11 @@ npm i polkadot-launch -g
 To use polkadot-launch, you need to have binary files for a `polkadot` relay chain and a
 `bifrost`.
 
-You can generate these files by cloning the `release-v0.9.1` branch of these projects and building them
+You can generate these files by cloning the `release-v0.9.3` branch of these projects and building them
 with the specific flags below:
 
 ```bash
-git clone -b release-v0.9.1 https://github.com/paritytech/polkadot
+git clone -b release-v0.9.3 https://github.com/paritytech/polkadot
 cd polkadot
 cargo build --release
 ```
