@@ -33,7 +33,7 @@ and
 ```
 git clone https://github.com/bifrost-finance/bifrost
 cd bifrost
-cargo build --release
+make build-all-release
 ```
 
 ## Use
