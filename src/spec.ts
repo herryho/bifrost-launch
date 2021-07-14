@@ -10,15 +10,21 @@ function nameCase(string: string) {
 
 // Get authority keys from within chainSpec data
 function getAuthorityKeys(chainSpec: ChainSpec) {
-	// this is the most recent spec struct
-	if (
-		chainSpec.genesis.runtime.runtime_genesis_config &&
-		chainSpec.genesis.runtime.runtime_genesis_config.palletSession
-	) {
-		return chainSpec.genesis.runtime.runtime_genesis_config.palletSession.keys;
+	// Check runtime_genesis_config key for rococo compatibility.
+	const runtimeConfig =
+		chainSpec.genesis.runtime.runtime_genesis_config ||
+		chainSpec.genesis.runtime;
+	if (runtimeConfig && runtimeConfig.session) {
+		return runtimeConfig.session.keys;
 	}
-	// Backward compatibility
-	return chainSpec.genesis.runtime.palletSession.keys;
+
+	// For retro-compatibility with substrate pre Polkadot 0.9.5
+	if (runtimeConfig && runtimeConfig.palletSession) {
+		return runtimeConfig.palletSession.keys;
+	}
+
+	console.error("  ⚠ session not found in runtimeConfig");
+	process.exit(1);
 }
 
 // Remove all existing keys from `session.keys`
@@ -28,7 +34,7 @@ export function clearAuthorities(spec: string) {
 	try {
 		chainSpec = JSON.parse(rawdata);
 	} catch {
-		console.error("failed to parse the chain spec");
+		console.error("  ⚠ failed to parse the chain spec");
 		process.exit(1);
 	}
 
@@ -91,13 +97,19 @@ export async function addGenesisParachain(
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
 
-	if (
-		chainSpec.genesis.runtime.runtime_genesis_config &&
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsParas
-	) {
-		let paras =
-			chainSpec.genesis.runtime.runtime_genesis_config.parachainsParas.paras;
-
+	// Check runtime_genesis_config key for rococo compatibility.
+	const runtimeConfig =
+		chainSpec.genesis.runtime.runtime_genesis_config ||
+		chainSpec.genesis.runtime;
+	let paras = undefined;
+	if (runtimeConfig.paras) {
+		paras = runtimeConfig.paras.paras;
+	}
+	// For retro-compatibility with substrate pre Polkadot 0.9.5
+	else if (runtimeConfig.parachainsParas) {
+		paras = runtimeConfig.parachainsParas.paras;
+	}
+	if (paras) {
 		let new_para = [
 			parseInt(para_id),
 			{
@@ -112,9 +124,13 @@ export async function addGenesisParachain(
 		let data = JSON.stringify(chainSpec, null, 2);
 		fs.writeFileSync(spec, data);
 		console.log(`  ✓ Added Genesis Parachain ${para_id}`);
+	} else {
+		console.error("  ⚠ paras not found in runtimeConfig");
+		process.exit(1);
 	}
 }
 
+// Update the `genesis` object in the chain specification.
 export async function addGenesisHrmpChannel(
 	spec: string,
 	hrmpChannel: HrmpChannelsConfig
@@ -126,30 +142,50 @@ export async function addGenesisHrmpChannel(
 		hrmpChannel.sender,
 		hrmpChannel.recipient,
 		hrmpChannel.maxCapacity,
-		hrmpChannel.maxMessageSize
+		hrmpChannel.maxMessageSize,
 	];
 
-	if (chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp &&
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp.preopenHrmpChannels
+	// Check runtime_genesis_config key for rococo compatibility.
+	const runtimeConfig =
+		chainSpec.genesis.runtime.runtime_genesis_config ||
+		chainSpec.genesis.runtime;
+	
+	let hrmp = undefined;
+
+	if (runtimeConfig.hrmp) {
+		hrmp = runtimeConfig.hrmp;
+	}
+	// For retro-compatibility with substrate pre Polkadot 0.9.5
+	else if (runtimeConfig.parachainsHrmp) {
+		hrmp = runtimeConfig.parachainsHrmp;
+	}
+
+	if (
+		hrmp && hrmp.preopenHrmpChannels
 	) {
-		chainSpec.genesis.runtime.runtime_genesis_config.parachainsHrmp.preopenHrmpChannels.push(newHrmpChannel);
+		hrmp.preopenHrmpChannels.push(newHrmpChannel);
 
 		let data = JSON.stringify(chainSpec, null, 2);
 		fs.writeFileSync(spec, data);
-		console.log(`  ✓ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`);
+		console.log(
+			`  ✓ Added HRMP channel ${hrmpChannel.sender} -> ${hrmpChannel.recipient}`
+		);
+	} else {
+		console.error("  ⚠ hrmp not found in runtimeConfig");
+		process.exit(1);
 	}
 }
 
-// Update the `runtime_genesis_config` in the genesis.
+// Update the runtime config in the genesis.
 // It will try to match keys which exist within the configuration and update the value.
 export async function changeGenesisConfig(spec: string, updates: any) {
 	let rawdata = fs.readFileSync(spec);
 	let chainSpec = JSON.parse(rawdata);
 
-	console.log(`\n⚙ Updating Parachains Genesis Configuration`);
+	console.log(`\n⚙ Updating Relay Chain Genesis Configuration`);
 
-	if (chainSpec.genesis.runtime.runtime_genesis_config) {
-		let config = chainSpec.genesis.runtime.runtime_genesis_config;
+	if (chainSpec.genesis) {
+		let config = chainSpec.genesis;
 		findAndReplaceConfig(updates, config);
 
 		let data = JSON.stringify(chainSpec, null, 2);
@@ -164,18 +200,20 @@ function findAndReplaceConfig(obj1: any, obj2: any) {
 		// See if obj2 also has this key
 		if (obj2.hasOwnProperty(key)) {
 			// If it goes deeper, recurse...
-			if (obj1[key].constructor === Object) {
+			if (
+				obj1[key] !== null &&
+				obj1[key] !== undefined &&
+				obj1[key].constructor === Object
+			) {
 				findAndReplaceConfig(obj1[key], obj2[key]);
 			} else {
 				obj2[key] = obj1[key];
 				console.log(
-					`  ✓ Updated Parachains Configuration [ ${key}: ${obj2[key]} ]`
+					`  ✓ Updated Genesis Configuration [ ${key}: ${obj2[key]} ]`
 				);
 			}
 		} else {
-			console.error(
-				`  ⚠ Bad Parachains Configuration [ ${key}: ${obj1[key]} ]`
-			);
+			console.error(`  ⚠ Bad Genesis Configuration [ ${key}: ${obj1[key]} ]`);
 		}
 	});
 }
