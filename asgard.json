@@ -44,7 +44,7 @@
     },
     "parachains": [
         {
-            "bin": "../bifrost-prod/target/release/bifrost",
+            "bin": "../bifrost/target/release/bifrost",
             "id": "2001",
             "balance": "1000000000000000000000",
             "chain": "asgard-local",
@@ -63,6 +63,38 @@
                 {
                     "wsPort": 9999,
                     "port": 30999,
+                    "name": "bob",
+                    "flags": [
+                        "--unsafe-ws-external",
+                        "--unsafe-rpc-external",
+                        "--rpc-cors=all",
+                        "-ldebug",
+                        "--ws-max-connections",
+                        5000
+                    ]
+                }
+            ]
+        },
+        {
+            "bin": "../Acala/target/release/acala",
+            "id": "2000",
+            "balance": "1000000000000000000000",
+            "chain": "local",
+            "nodes": [
+                {
+                    "wsPort": 8866,
+                    "port": 30666,
+                    "flags": [
+                        "--unsafe-ws-external",
+                        "--unsafe-rpc-external",
+                        "--rpc-cors=all",
+                        "--",
+                        "--execution=wasm"
+                    ]
+                },
+                {
+                    "wsPort": 8877,
+                    "port": 30777,
                     "name": "bob",
                     "flags": [
                         "--unsafe-ws-external",
