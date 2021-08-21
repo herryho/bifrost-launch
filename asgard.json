@@ -72,6 +72,19 @@
                         "--ws-max-connections",
                         5000
                     ]
+                },
+                {
+                    "wsPort": 5589,
+                    "port": 30555,
+                    "name": "Katie",
+                    "flags": [
+                        "--unsafe-ws-external",
+                        "--unsafe-rpc-external",
+                        "--rpc-cors=all",
+                        "-ldebug",
+                        "--ws-max-connections",
+                        5000
+                    ]
                 }
             ]
         },
@@ -96,6 +109,19 @@
                     "wsPort": 8877,
                     "port": 30777,
                     "name": "bob",
+                    "flags": [
+                        "--unsafe-ws-external",
+                        "--unsafe-rpc-external",
+                        "--rpc-cors=all",
+                        "-ldebug",
+                        "--ws-max-connections",
+                        5000
+                    ]
+                },
+                {
+                    "wsPort": 5588,
+                    "port": 30588,
+                    "name": "Jerry",
                     "flags": [
                         "--unsafe-ws-external",
                         "--unsafe-rpc-external",
