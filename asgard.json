@@ -72,19 +72,6 @@
                         "--ws-max-connections",
                         5000
                     ]
-                },
-                {
-                    "wsPort": 5589,
-                    "port": 30555,
-                    "name": "Katie",
-                    "flags": [
-                        "--unsafe-ws-external",
-                        "--unsafe-rpc-external",
-                        "--rpc-cors=all",
-                        "-ldebug",
-                        "--ws-max-connections",
-                        5000
-                    ]
                 }
             ]
         },
@@ -92,7 +79,7 @@
             "bin": "../Acala/target/release/acala",
             "id": "2000",
             "balance": "1000000000000000000000",
-            "chain": "local",
+            "chain": "karura-dev",
             "nodes": [
                 {
                     "wsPort": 8866,
@@ -119,9 +106,8 @@
                     ]
                 },
                 {
-                    "wsPort": 5588,
-                    "port": 30588,
-                    "name": "Jerry",
+                    "wsPort": 6677,
+                    "port": 36677,
                     "flags": [
                         "--unsafe-ws-external",
                         "--unsafe-rpc-external",
