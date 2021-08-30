@@ -1,7 +1,7 @@
 {
     "relaychain": {
         "bin": "../polkadot/target/release/polkadot",
-        "chain": "kusama-local",
+        "chain": "rococo-local",
         "nodes": [
             {
                 "name": "alice",
@@ -51,26 +51,14 @@
             "nodes": [
                 {
                     "wsPort": 9988,
-                    "port": 30888,
+                    "port": 31200,
+                    "name": "alice",
                     "flags": [
                         "--unsafe-ws-external",
                         "--unsafe-rpc-external",
                         "--rpc-cors=all",
                         "--",
                         "--execution=wasm"
-                    ]
-                },
-                {
-                    "wsPort": 9999,
-                    "port": 30999,
-                    "name": "bob",
-                    "flags": [
-                        "--unsafe-ws-external",
-                        "--unsafe-rpc-external",
-                        "--rpc-cors=all",
-                        "-ldebug",
-                        "--ws-max-connections",
-                        5000
                     ]
                 }
             ]
@@ -82,8 +70,9 @@
             "chain": "karura-dev",
             "nodes": [
                 {
-                    "wsPort": 8866,
-                    "port": 30666,
+                    "wsPort": 9999,
+                    "port": 31300,
+                    "name": "alice",
                     "flags": [
                         "--unsafe-ws-external",
                         "--unsafe-rpc-external",
@@ -91,36 +80,24 @@
                         "--",
                         "--execution=wasm"
                     ]
-                },
-                {
-                    "wsPort": 8877,
-                    "port": 30777,
-                    "name": "bob",
-                    "flags": [
-                        "--unsafe-ws-external",
-                        "--unsafe-rpc-external",
-                        "--rpc-cors=all",
-                        "-ldebug",
-                        "--ws-max-connections",
-                        5000
-                    ]
-                },
-                {
-                    "wsPort": 6677,
-                    "port": 36677,
-                    "flags": [
-                        "--unsafe-ws-external",
-                        "--unsafe-rpc-external",
-                        "--rpc-cors=all",
-                        "-ldebug",
-                        "--ws-max-connections",
-                        5000
-                    ]
                 }
             ]
         }
     ],
-    "hrmpChannels": [],
+    "hrmpChannels": [
+        {
+            "sender": 2001,
+            "recipient": 2000,
+            "maxCapacity": 8,
+            "maxMessageSize": 1024
+        },
+        {
+            "sender": 2000,
+            "recipient": 2001,
+            "maxCapacity": 8,
+            "maxMessageSize": 1024
+        }
+    ],
     "types": {},
     "finalization": false
 }
