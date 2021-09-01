@@ -45,7 +45,7 @@
     "parachains": [
         {
             "bin": "../bifrost/target/release/bifrost",
-            "id": "200",
+            "id": "2001",
             "balance": "1000000000000000000000",
             "chain": "bifrost-local",
             "nodes": [
@@ -60,20 +60,14 @@
                         "--",
                         "--execution=wasm"
                     ]
-                },
-                {
-                    "wsPort": 9989,
-                    "port": 31201,
-                    "name": "bob",
-                    "flags": ["--", "--execution=wasm"]
                 }
             ]
         },
         {
-            "bin": "../bifrost/target/release/bifrost",
-            "id": "300",
+            "bin": "../Acala/target/release/acala",
+            "id": "2000",
             "balance": "1000000000000000000000",
-            "chain": "bifrost-local",
+            "chain": "karura-dev",
             "nodes": [
                 {
                     "wsPort": 9999,
@@ -92,10 +86,16 @@
     ],
     "hrmpChannels": [
         {
-            "sender": 200,
-            "recipient": 300,
+            "sender": 2001,
+            "recipient": 2000,
             "maxCapacity": 8,
-            "maxMessageSize": 512
+            "maxMessageSize": 1024
+        },
+        {
+            "sender": 2000,
+            "recipient": 2001,
+            "maxCapacity": 8,
+            "maxMessageSize": 1024
         }
     ],
     "types": {},
